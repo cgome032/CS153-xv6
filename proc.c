@@ -287,7 +287,7 @@ exit(int status)
   }
   
   // Add exit status to curproc - Lab01
-  //curproc->exitStatus = status;
+  curproc->exitStatus = status;
 
   begin_op();
   iput(curproc->cwd);
@@ -301,8 +301,9 @@ exit(int status)
 
   // Pass abandoned children to init.
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->parent == curproc){
       p->parent = initproc;
-      if(p->state == ZOMBIE){
+      if(p->state == ZOMBIE)
         wakeup1(initproc);
     }
   }
