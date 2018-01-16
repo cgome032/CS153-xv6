@@ -95,5 +95,6 @@ sys_uptime(void)
 int sys_waitpid(void)
 {
   // Do stuff
+  return 0;
 
 }
