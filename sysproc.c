@@ -26,6 +26,11 @@ sys_wait(void)
   return wait();
 }
 
+int sys_wait (int *status)
+{
+  return wait(status);
+}
+
 int
 sys_kill(void)
 {
