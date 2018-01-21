@@ -13,13 +13,16 @@ sys_fork(void)
   return fork();
 }
 
+/*
 int
 sys_exit(void)
 {
   exit(1);
   return 0;  // not reached
 }
+*/
 
+// Added new sys_wait system call function
 int
 sys_wait(void)
 {
