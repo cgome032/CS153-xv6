@@ -100,9 +100,8 @@ sys_uptime(void)
 
 // Waitpid function definition
 // Still need to finish
-int sys_waitpid(void)
+int sys_waitpid(int pid, int *status, int options)
 {
-  // Do stuff
-  return 0;
+  return waitpid(pid, status, options);
 
 }
