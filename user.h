@@ -5,7 +5,7 @@ struct rtcdate;
 int fork(void);
 int exit(int) __attribute__((noreturn)); // Changed prototype function for lab01 - 1/16/18
 //int wait(void);
-int wait(int *); // changed 1/20 for lab 1 to add status
+int wait(int*); // changed 1/20 for lab 1 to add status
 int pipe(int*);
 int write(int, void*, int);
 int read(int, void*, int);
