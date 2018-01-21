@@ -410,6 +410,50 @@ wait(int *status)
   }
 }
 
+int waitpid(int pid, int *status, int options) {
+  struct proc *p;
+  struct proc *curproc = myproc();
+  int pidFound = 0;
+
+  acquire(&ptable.lock);
+
+  for(;;) {
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+      if (p->pid != pid) continue;
+      pidFound = 1;
+      if (p->state == ZOMBIE) {
+        // do stuff
+        
+        if (status != 0) {
+          *status = p->exitStatus;
+        }
+
+        kfree(p->kstack);
+        p->kstack = 0;
+        freevm(p->pgdir);
+        p->pid = 0;
+        p->parent = 0;
+        p->name[0] = 0;
+        p->killed = 0;
+        p->state = UNUSED;
+        release(&ptable.lock);
+        return pid;
+      }
+    }
+    
+    // if the pid was not found at all, or if current process was killed
+    // then return -1 (error)
+    if (!pidFound || curproc->killed) {
+      release(&ptable.lock);
+      return -1;
+    }
+ 
+    // is this necessary? copied from wait() above,
+    // but we don't care about children here
+    sleep(curproc, &ptable.lock); // DOC: wait-sleep
+  }
+}
+
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
