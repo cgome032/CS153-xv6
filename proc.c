@@ -382,8 +382,8 @@ wait(int *status)
         // Lab 1 changes
         // if status parameter IS a null pointer, discard child exit status
         // if status parameter IS NOT null, then store child exit status there
-        if (status != NULL) {
-			&status = p->exitStatus;
+        if (status != 0) {
+          *status = p->exitStatus;
         }
         
         kfree(p->kstack);
