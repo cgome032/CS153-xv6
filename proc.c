@@ -285,9 +285,6 @@ exit(int status)
       curproc->ofile[fd] = 0;
     }
   }
-  
-  // Add exit status to curproc - Lab01
-  curproc->exitStatus = status;
 
   begin_op();
   iput(curproc->cwd);
@@ -295,6 +292,9 @@ exit(int status)
   curproc->cwd = 0;
 
   acquire(&ptable.lock);
+  
+  // Add exit status to curproc - Lab01
+  curproc->exitStatus = status;
 
   // Parent might be sleeping in wait().
   wakeup1(curproc->parent);

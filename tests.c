@@ -24,20 +24,20 @@ void exittest() {
 		// in parent
 		printf(stdout, "hello from parent\n");
 		
-		int exitStatus = -1;
+		int exitStatus;
 		int childpid = wait(&exitStatus);
 		
 		if (childpid > 0) {
 			if (exitStatus >= 0) {
-				printf(stdout, "exit status of pid %d: %d\n", pid, exitStatus);
+				printf(stdout, "exit status of child pid %d: %d\n", childpid, exitStatus);
 			}
 			else {
-				printf(stdout, "Error in pid %d; no exit status\n", pid);
+				printf(stdout, "Error in pid %d; no exit status\n", childpid);
 				exit(0);
 			}
 		}
 		else {
-			printf(stdout, "error: no return value, child process not found\n");
+			printf(stdout, "error: process had no children\n");
 		}
 		
 		exit(0);
