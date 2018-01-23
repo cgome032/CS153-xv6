@@ -18,7 +18,7 @@ void exittest() {
 		// in child
 		
 		printf(stdout, "hello from child\nexiting child with status: %d\n", 1);
-		exit(1);
+		exit(2);
 	}
 	else {
 		// in parent

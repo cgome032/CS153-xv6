@@ -34,8 +34,13 @@ sys_wait(void)
 }
 */
 
-int sys_wait (int *status)
+int sys_wait (void)
 {
+  int *status;
+  if (argptr(0, (void*)&status, sizeof(int)) < 0) {
+	return -1;
+  }
+  
   return wait(status);
 }
 
