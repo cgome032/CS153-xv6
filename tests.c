@@ -11,6 +11,9 @@
 
 int stdout = 1;
 
+// Exittest function
+// This function is used to test our exit and wait system calls
+//
 void exittest() {
 	printf(stdout, "exittest started\n");
 	int pid;
@@ -52,17 +55,49 @@ void waittest(void) {
 	
 }
 
+// Waitpidtest function
+// This function is used to test our waitpid system call.  Can also be used to test exit
+//
 void waitpidtest(void) {
 	//int i, pid;
-	
 	printf(stdout, "waitpidtest started\n");
-	
+	int pid1, pid2; // We can choose which pid we are going to wait for
+
+	if ((pid1 = fork())==0){
+		// First Child
+		printf(stdout, "This is the first child created, pid(%d)\n",(int)getpid());
+		exit(0); // First child exits
+	}
+	else if ((pid2 = fork())==0){
+
+		// Second Child
+
+		printf(stdout, "This is the second child created, pid(%d)\n", (int)getpid());
+		exit(0); // Second child exits
+	}
+	else{
+		// This is the parent process
+		printf(stdout, "This is the parent process\n");
+		int exitStatus; // The exitStatus that gets updated by the waitpid function
+		int termpid = waitpid(pid1,&exitStatus,0);
+		printf(stdout, "Waited and now it's back\n");
+		
+		if(termpid > 0 && exitStatus >=0){
+			printf(stdout, "exit status of the pid(%d): %d\n", termpid,exitStatus);
+		}
+		else{
+			printf(stdout, "error: process did not return correctly\n");
+		}
+		exit(0); // The parent exits
+	}
 }
 
 int main() {
-	printf(stdout, "in tests.c main function\n");
+	//printf(stdout, "in tests.c main function\n");
 	
-	exittest();
+	//exittest();
+	printf(stdout, "Testing waitpid function\n");
+	waitpidtest();
 	
 	exit(0);
 }
