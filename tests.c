@@ -88,6 +88,14 @@ void waitpidtest(void) {
 		else{
 			printf(stdout, "error: process did not return correctly\n");
 		}
+		
+		int exitStatus2;
+		printf(stdout, "Now waiting for 2nd child process to exit\n");
+		if (waitpid(pid2, &exitStatus2, 0) >= 0) {
+			printf(stdout, "2nd child exited pid(%d) with exit status: %d\n", pid2, exitstatus2);
+		}
+		
+		
 		exit(0); // The parent exits
 	}
 }
