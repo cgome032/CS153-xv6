@@ -92,7 +92,7 @@ void waitpidtest(void) {
 		int exitStatus2;
 		printf(stdout, "Now waiting for 2nd child process to exit\n");
 		if (waitpid(pid2, &exitStatus2, 0) >= 0) {
-			printf(stdout, "2nd child exited pid(%d) with exit status: %d\n", pid2, exitstatus2);
+			printf(stdout, "2nd child exited pid(%d) with exit status: %d\n", pid2, exitStatus2);
 		}
 		
 		
