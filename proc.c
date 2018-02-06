@@ -88,6 +88,9 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  
+  // set priority to 31 (low priority) initially
+  p->priority = 31;
 
   release(&ptable.lock);
 
@@ -111,7 +114,7 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
-
+  
   return p;
 }
 
@@ -419,8 +422,9 @@ scheduler(void)
   struct cpu *c = mycpu();
   c->proc = 0;
   
-  struct proc* highestProc;
-  highestProc->priority = 32;
+  struct proc testProc;
+  testProc.priority = 32;
+  struct proc* highestProc = &testProc;
   
   for(;;){
     // Enable interrupts on this processor.
@@ -433,6 +437,11 @@ scheduler(void)
     // need nested loops? 
     for (p = ptable.proc; p< &ptable.proc[NPROC]; p++) {
 		if (p->state != RUNNABLE)
+			continue;
+		
+		// check to make sure it doesn't stay on the same process forever
+		// THIS DOESN'T WORK
+		if (p == highestProc) 
 			continue;
 		
 		if (p->priority < highestProc->priority) {
@@ -462,7 +471,7 @@ scheduler(void)
 		// it has lower priority (aging priorities)
 		//setpriority(highestProc->pid, highestProc->priority + 1);
 		
-		swtch(&(c->scheduler), highestProc->context);
+		swtch(&(c->scheduler), highestProc->context); // context switch
 		switchkvm();
 		
 		// Process should be done running now
