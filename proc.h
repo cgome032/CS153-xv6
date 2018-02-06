@@ -55,6 +55,7 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   int exitStatus;	       // If 1, clean exit.  If 0, Error.
+  int priority;		       // Priority for scheduler 
 };
 
 // Process memory is laid out contiguously, low addresses first:
