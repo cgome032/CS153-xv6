@@ -123,3 +123,11 @@ int sys_waitpid(void)
   }
 
 }
+
+// Set Priority function
+// Needs to change the priority of a process for scheduling purposes
+int sys_setpriority(void)
+{
+  return 0;
+
+}
