@@ -374,7 +374,7 @@ int waitpid(int pid, int *status, int options) {
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
-void
+/*void
 scheduler(void)
 {
   struct proc *p;
@@ -408,6 +408,82 @@ scheduler(void)
     release(&ptable.lock);
 
   }
+}*/
+
+// Lab 2 Priority Scheduler
+// 0 is highest priority, 31 is lowest priority
+void
+scheduler(void)
+{
+  struct proc *p;
+  struct cpu *c = mycpu();
+  c->proc = 0;
+  
+  struct proc* highestPriority;
+  
+  for(;;){
+    // Enable interrupts on this processor.
+    sti();
+
+    // Loop over process table looking for process to run.
+    acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state != RUNNABLE)
+        continue;
+
+      // Switch to chosen process.  It is the process's job
+      // to release ptable.lock and then reacquire it
+      // before jumping back to us.
+      c->proc = p;
+      switchuvm(p);
+      p->state = RUNNING;
+
+      swtch(&(c->scheduler), p->context);
+      switchkvm();
+
+      // Process is done running for now.
+      // It should have changed its p->state before coming back.
+      c->proc = 0;
+    }
+    release(&ptable.lock);
+
+  }
+}
+
+// set the priority of a certain process
+int
+setpriority(int pid, int newPriority)
+{
+	// check if priority parameter is out of range, return with error
+	if (newPriority < 0 || newPriority > 31) {
+		return -1;
+	}
+	
+	struct proc* p;
+	int pidFound = 0;
+	
+	acquire(&ptable.lock);
+
+	// loop through all processes until we find the correct process
+	for(;;) {
+		for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+			if (p->pid != pid) continue;
+			pidFound = 1;
+			if (p->pid == pid) {
+				// set the priority of the process to the new priority
+				p->priority = newPriority;
+				release(&ptable.lock);
+				return 0;
+			}
+		}
+	}
+	
+	// if we never find the pid, return -1
+	if (!pidFound) {
+      release(&ptable.lock);
+      return -1;
+    }
+	
 }
 
 // Enter scheduler.  Must hold only ptable.lock
