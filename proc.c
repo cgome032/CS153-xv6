@@ -436,25 +436,25 @@ scheduler(void)
     // new loop
     // need nested loops? 
     for (p = ptable.proc; p< &ptable.proc[NPROC]; p++) {
-		if (p->state != RUNNABLE)
+		if (p->state != RUNNABLE || p->priority > highestProc->priority) {
+			if (p->state == RUNNABLE) {
+				if (p->priority > 0) setpriority(p->pid, p->priority - 1);
+			}
 			continue;
+		}
 		
-		// check to make sure it doesn't stay on the same process forever
-		// THIS DOESN'T WORK
-		if (p == highestProc) 
-			continue;
-		
-		if (p->priority < highestProc->priority) {
+		if (p->priority <= highestProc->priority) {
 			highestProc = p;
 		}
-		//aging
-		//else {
-			//// make it higher priority
-			//// make sure it doesnt go below 0
-			//// we should actually call setpriority()
-			//p->priority -= 1;
+		else {
+			// make it higher priority
+			// make sure it doesnt go below 0
+			// we should actually call setpriority()
+			if (p->priority > 0) {
+				setpriority(p->pid, p->priority - 1);
+			}
 			
-		//}
+		}
 		
 	}
 	
@@ -482,6 +482,73 @@ scheduler(void)
 
   }
 }
+
+
+// broken priority scheduler (kernel panic)
+//void
+//scheduler(void)
+//{
+  //struct proc *p; 
+  //struct proc *p2;
+  //struct cpu *c = mycpu();
+  //c->proc = 0;
+  
+  ////struct proc testProc;
+  ////testProc.priority = 32;
+  ////struct proc* highestProc = &testProc;
+  
+  //struct proc* highestProc;
+        
+  //for(;;){
+    //// Enable interrupts on this processor.
+    //sti();
+
+    //// Loop over process table looking for process to run.
+    //acquire(&ptable.lock);
+    
+    
+    //highestProc = ptable.proc;
+    //// new loop
+    //// need nested loops? 
+    //for (p = ptable.proc; p< &ptable.proc[NPROC]; p++) {
+		
+		//for (p2 = ptable.proc; p2 < &ptable.proc[NPROC]; p2++) {
+			//if (p2->state != RUNNABLE || p2->priority > highestProc->priority) {
+				//if (p2->state == RUNNABLE) {
+					//if (p2->priority > 0) setpriority(p2->pid, p2->priority - 1);
+				//}
+				//continue;
+			//}
+			
+			//if (p2->priority < highestProc->priority) {
+				//highestProc = p2;
+			//}
+		//}
+		
+		//if (highestProc->priority == 32) {
+		//// no processes found within priority range
+		//// error?
+		//}
+		
+		//c->proc = highestProc;
+		//switchuvm(highestProc); // what does this do?
+		//highestProc->state = RUNNING;	
+		
+		//// decrement the priority before running, so that during the next loop,
+		//// it has lower priority (aging priorities)
+		////setpriority(highestProc->pid, highestProc->priority + 1);
+		
+		//swtch(&(c->scheduler), highestProc->context); // context switch
+		//switchkvm();
+		
+		//// Process should be done running now
+		//c->proc = 0;
+		
+		//release(&ptable.lock);
+		
+	//}	
+  //}
+//}
 
 // set the priority of a certain process
 int
