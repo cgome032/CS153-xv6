@@ -469,7 +469,7 @@ scheduler(void)
 		
 		// decrement the priority before running, so that during the next loop,
 		// it has lower priority (aging priorities)
-		//setpriority(highestProc->pid, highestProc->priority + 1);
+		setpriority(highestProc->pid, highestProc->priority + 1);
 		
 		swtch(&(c->scheduler), highestProc->context); // context switch
 		switchkvm();
