@@ -422,9 +422,11 @@ scheduler(void)
   struct cpu *c = mycpu();
   c->proc = 0;
   
-  struct proc testProc;
-  testProc.priority = 32;
-  struct proc* highestProc = &testProc;
+  //struct proc testProc;
+  //testProc.priority = 32;
+  //struct proc* highestProc = &testProc;
+  
+  struct proc* highestProc;
   
   for(;;){
     // Enable interrupts on this processor.
@@ -432,6 +434,8 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
+    
+    highestProc = ptable.proc;
     
     // new loop
     // need nested loops? 
@@ -449,7 +453,6 @@ scheduler(void)
 		else {
 			// make it higher priority
 			// make sure it doesnt go below 0
-			// we should actually call setpriority()
 			if (p->priority > 0) {
 				setpriority(p->pid, p->priority - 1);
 			}
@@ -462,21 +465,20 @@ scheduler(void)
 		// no processes found within priority range
 		// error?
 	}
-	else {
-		c->proc = highestProc;
-		switchuvm(highestProc); // what does this do?
-		highestProc->state = RUNNING;
-		
-		// decrement the priority before running, so that during the next loop,
-		// it has lower priority (aging priorities)
-		setpriority(highestProc->pid, highestProc->priority + 1);
-		
-		swtch(&(c->scheduler), highestProc->context); // context switch
-		switchkvm();
-		
-		// Process should be done running now
-		c->proc = 0;
-	}
+	c->proc = highestProc;
+	switchuvm(highestProc); // what does this do?
+	highestProc->state = RUNNING;
+	
+	// decrement the priority before running, so that during the next loop,
+	// it has lower priority (aging priorities)
+	setpriority(highestProc->pid, highestProc->priority + 1);
+	
+	swtch(&(c->scheduler), highestProc->context); // context switch
+	switchkvm();
+	
+	// Process should be done running now
+	c->proc = 0;
+
 	
 	release(&ptable.lock);
 
