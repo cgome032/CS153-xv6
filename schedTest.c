@@ -45,6 +45,10 @@ int main() {
 		}
 		exit(0);
 	}
+	int status1, status2, status3;
+	waitpid(pid1,&status1,0);
+	waitpid(pid2,&status2,0);
+	waitpid(pid3,&status3,0);
 	
 	exit(0);
 }
