@@ -130,10 +130,10 @@ int sys_setpriority(void)
 {
   int pid;
   int priority;
-  if(argint(0,&pid) < 0 || argint(1,&priority) < 0){
+  if(argint(0,&pid) < 0){
     return -1;
   }
   else{
-    return setpriority(pid,priority);
+    return setpriority(priority);
   }
 }
