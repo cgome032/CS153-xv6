@@ -442,7 +442,10 @@ scheduler(void)
     for (p = ptable.proc; p< &ptable.proc[NPROC]; p++) {
 		if (p->state != RUNNABLE || p->priority > highestProc->priority) {
 			if (p->state == RUNNABLE) {
-				if (p->priority > 0) setpriority(p->pid, p->priority - 1);
+				if (p->priority > 0) {
+					//setpriority(p->priority - 1);
+					p->priority--;
+				}
 			}
 			continue;
 		}
@@ -454,7 +457,8 @@ scheduler(void)
 			// make it higher priority
 			// make sure it doesnt go below 0
 			if (p->priority > 0) {
-				setpriority(p->pid, p->priority - 1);
+				//setpriority(p->priority - 1);
+				p->priority--;
 			}
 			
 		}
@@ -471,7 +475,8 @@ scheduler(void)
 	
 	// decrement the priority before running, so that during the next loop,
 	// it has lower priority (aging priorities)
-	setpriority(highestProc->pid, highestProc->priority + 1);
+	//setpriority(highestProc->priority + 1);
+	highestProc->priority++; 
 	
 	swtch(&(c->scheduler), highestProc->context); // context switch
 	switchkvm();
@@ -554,37 +559,39 @@ scheduler(void)
 
 // set the priority of a certain process
 int
-setpriority(int pid, int newPriority)
+setpriority(int newPriority)
 {
 	// check if priority parameter is out of range, return with error
 	if (newPriority < 0 || newPriority > 31) {
 		return -1;
 	}
 	
-	struct proc* p;
-	int pidFound = 0;
+	//struct proc* p;
+	struct proc* myProc = myproc();
+	//int pidFound = 0;
 	
 	acquire(&ptable.lock);
+	myProc->priority = newPriority;
+	release(&ptable.lock);
+	return 0;
 
-	// loop through all processes until we find the correct process
-	for(;;) {
-		for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-			if (p->pid != pid) continue;
-			pidFound = 1;
-			if (p->pid == pid) {
-				// set the priority of the process to the new priority
-				p->priority = newPriority;
-				release(&ptable.lock);
-				return 0;
-			}
-		}
-	}
+	//// loop through all processes until we find the correct process
+	//for(;;) {
+		//for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+			//if (p->pid != myProc->pid) continue;
+			//pidFound = 1;
+			//// set the priority of the process to the new priority
+			//p->priority = newPriority;
+			//release(&ptable.lock);
+			//return 0;
+		//}
+	//}
 	
-	// if we never find the pid, return -1
-	if (!pidFound) {
-      release(&ptable.lock);
-      return -1;
-    }
+	//// if we never find the pid, return -1
+	//if (!pidFound) {
+      //release(&ptable.lock);
+      //return -1;
+    //}
 	
 }
 
