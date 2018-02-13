@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "user.h"
 
 struct {
   struct spinlock lock;
@@ -89,8 +90,10 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   
+  // lab 2
   // set priority to 31 (low priority) initially
   p->priority = 31;
+ 
 
   release(&ptable.lock);
 
@@ -300,7 +303,7 @@ wait(int *status)
         if (status != 0) {
           *status = p->exitStatus;
         }
-        
+        p->turnaroundTime = uptime();
         kfree(p->kstack);
         p->kstack = 0;
         freevm(p->pgdir);
@@ -362,9 +365,7 @@ int waitpid(int pid, int *status, int options) {
       release(&ptable.lock);
       return -1;
     }
- 
-    // is this necessary? copied from wait() above,
-    // but we don't care about children here
+
     sleep(curproc, &ptable.lock); // DOC: wait-sleep
   }
 }
@@ -377,41 +378,7 @@ int waitpid(int pid, int *status, int options) {
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
-/*void
-scheduler(void)
-{
-  struct proc *p;
-  struct cpu *c = mycpu();
-  c->proc = 0;
-  
-  for(;;){
-    // Enable interrupts on this processor.
-    sti();
 
-    // Loop over process table looking for process to run.
-    acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
-
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
-
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
-
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
-    }
-    release(&ptable.lock);
-
-  }
-}*/
 
 // Lab 2 Priority Scheduler
 // 0 is highest priority, 31 is lowest priority
@@ -490,73 +457,6 @@ scheduler(void)
   }
 }
 
-
-// broken priority scheduler (kernel panic)
-//void
-//scheduler(void)
-//{
-  //struct proc *p; 
-  //struct proc *p2;
-  //struct cpu *c = mycpu();
-  //c->proc = 0;
-  
-  ////struct proc testProc;
-  ////testProc.priority = 32;
-  ////struct proc* highestProc = &testProc;
-  
-  //struct proc* highestProc;
-        
-  //for(;;){
-    //// Enable interrupts on this processor.
-    //sti();
-
-    //// Loop over process table looking for process to run.
-    //acquire(&ptable.lock);
-    
-    
-    //highestProc = ptable.proc;
-    //// new loop
-    //// need nested loops? 
-    //for (p = ptable.proc; p< &ptable.proc[NPROC]; p++) {
-		
-		//for (p2 = ptable.proc; p2 < &ptable.proc[NPROC]; p2++) {
-			//if (p2->state != RUNNABLE || p2->priority > highestProc->priority) {
-				//if (p2->state == RUNNABLE) {
-					//if (p2->priority > 0) setpriority(p2->pid, p2->priority - 1);
-				//}
-				//continue;
-			//}
-			
-			//if (p2->priority < highestProc->priority) {
-				//highestProc = p2;
-			//}
-		//}
-		
-		//if (highestProc->priority == 32) {
-		//// no processes found within priority range
-		//// error?
-		//}
-		
-		//c->proc = highestProc;
-		//switchuvm(highestProc); // what does this do?
-		//highestProc->state = RUNNING;	
-		
-		//// decrement the priority before running, so that during the next loop,
-		//// it has lower priority (aging priorities)
-		////setpriority(highestProc->pid, highestProc->priority + 1);
-		
-		//swtch(&(c->scheduler), highestProc->context); // context switch
-		//switchkvm();
-		
-		//// Process should be done running now
-		//c->proc = 0;
-		
-		//release(&ptable.lock);
-		
-	//}	
-  //}
-//}
-
 // set the priority of a certain process
 int
 setpriority(int newPriority)
@@ -566,32 +466,12 @@ setpriority(int newPriority)
 		return -1;
 	}
 	
-	//struct proc* p;
 	struct proc* myProc = myproc();
-	//int pidFound = 0;
-	
+		
 	acquire(&ptable.lock);
 	myProc->priority = newPriority;
 	release(&ptable.lock);
 	return 0;
-
-	//// loop through all processes until we find the correct process
-	//for(;;) {
-		//for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-			//if (p->pid != myProc->pid) continue;
-			//pidFound = 1;
-			//// set the priority of the process to the new priority
-			//p->priority = newPriority;
-			//release(&ptable.lock);
-			//return 0;
-		//}
-	//}
-	
-	//// if we never find the pid, return -1
-	//if (!pidFound) {
-      //release(&ptable.lock);
-      //return -1;
-    //}
 	
 }
 
