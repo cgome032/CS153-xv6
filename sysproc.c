@@ -136,3 +136,17 @@ int sys_setpriority(void)
     return setpriority(priority);
   }
 }
+
+// Turnaround time function
+// Grabs ticks and returns to program
+uint sys_turnaround(void)
+{
+  uint xticks;
+
+  acquire(&tickslock);
+  xticks = ticks;
+  release(&tickslock);
+  
+  return xticks; 
+
+}
