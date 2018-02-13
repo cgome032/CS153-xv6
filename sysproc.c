@@ -128,9 +128,8 @@ int sys_waitpid(void)
 // Needs to change the priority of a process for scheduling purposes
 int sys_setpriority(void)
 {
-  int pid;
   int priority;
-  if(argint(0,&pid) < 0){
+  if(argint(0,&priority) < 0){
     return -1;
   }
   else{
