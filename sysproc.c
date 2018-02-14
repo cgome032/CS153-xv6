@@ -141,6 +141,8 @@ int sys_setpriority(void)
 // Grabs ticks and returns to program
 uint sys_turnaround(void)
 {
+  // Just use a helper function
+  /*
   uint xticks;
 
   acquire(&tickslock);
@@ -148,5 +150,8 @@ uint sys_turnaround(void)
   release(&tickslock);
   
   return xticks; 
+  */
+
+  return turnaround();
 
 }

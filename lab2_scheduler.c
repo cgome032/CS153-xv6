@@ -22,6 +22,7 @@ int PScheduler(void){
 
   int pid;
   int i,j,k;
+  uint endtime;
   
   printf(1, "\n  Step 2: testing the priority scheduler and setpriority(int priority)) systema call:\n");
   printf(1, "\n  Step 2: Assuming that the priorities range between range between 0 to 31\n");
@@ -41,6 +42,8 @@ int PScheduler(void){
 	    }
           }
 	   printf(1, "\n child# %d with priority %d has finished! \n",getpid(),30-10*i);
+ 	   endtime = turnaround();
+           printf(1,"\n The end time is %d ticks\n", endtime);
 	   exit(0);		
         }
         else {

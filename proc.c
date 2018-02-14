@@ -6,7 +6,6 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
-#include "user.h"
 
 struct {
   struct spinlock lock;
@@ -303,7 +302,7 @@ wait(int *status)
         if (status != 0) {
           *status = p->exitStatus;
         }
-        p->turnaroundTime = uptime();
+        p->turnaroundTime = turnaround();
         kfree(p->kstack);
         p->kstack = 0;
         freevm(p->pgdir);
@@ -651,4 +650,17 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+// Turnaround function addition
+uint
+turnaround(void)
+{
+  uint xticks;
+  
+  acquire(&tickslock);
+  xticks = ticks;
+  release(&tickslock);
+
+  return xticks;
 }
