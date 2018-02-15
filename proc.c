@@ -20,6 +20,8 @@ extern void trapret(void);
 
 static void wakeup1(void *chan);
 
+extern int uptime(void);
+
 void
 pinit(void)
 {
@@ -435,6 +437,7 @@ scheduler(void)
 		// no processes found within priority range
 		// error?
 	}
+	highestProc->turnaroundTime=turnaround();
 	c->proc = highestProc;
 	switchuvm(highestProc); // what does this do?
 	highestProc->state = RUNNING;
