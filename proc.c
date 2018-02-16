@@ -94,7 +94,7 @@ found:
   // lab 2
   // set priority to 31 (low priority) initially
   p->priority = 31;
-  p->beginTime = currenttime();
+  //p->beginTime = currenttime();
  
 
   release(&ptable.lock);
@@ -223,6 +223,7 @@ fork(void)
   acquire(&ptable.lock);
 
   np->state = RUNNABLE;
+  np->beginTime=currenttime();
 
   release(&ptable.lock);
 
