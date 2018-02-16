@@ -260,7 +260,11 @@ exit(int status)
   
   // Add exit status to curproc - Lab01
   curproc->exitStatus = status;
-  turnaround();
+  //turnaround();
+  uint time;
+  time = currenttime();
+  curproc->turnaroundTime = time - curproc->beginTime;
+  cprintf("Turnaround time for this process is: %d\n", curproc->turnaroundTime);
 
   // Parent might be sleeping in wait().
   wakeup1(curproc->parent);
