@@ -141,17 +141,15 @@ int sys_setpriority(void)
 // Grabs ticks and returns to program
 uint sys_turnaround(void)
 {
-  // Just use a helper function
-  /*
-  uint xticks;
-
-  acquire(&tickslock);
-  xticks = ticks;
-  release(&tickslock);
-  
-  return xticks; 
-  */
+  // Return turnaround function
 
   return turnaround();
+
+}
+
+uint sys_currenttime(void)
+{
+  // Returns current time of system
+  return currenttime();
 
 }

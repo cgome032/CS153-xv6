@@ -27,7 +27,7 @@ int uptime(void);
 int waitpid(int,int*,int);
 int setpriority(int);
 uint turnaround(void); // Return turnaround time
-
+uint currenttime(void); // Returns the current time of the xv6 system
 // ulib.c
 int stat(char*, struct stat*);
 char* strcpy(char*, char*);

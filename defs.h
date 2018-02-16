@@ -124,6 +124,7 @@ void            yield(void);
 int		waitpid(int,int*,int);
 int		setpriority(int);
 uint		turnaround(void);
+uint		currenttime(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

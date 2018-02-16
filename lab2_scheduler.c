@@ -42,9 +42,11 @@ int PScheduler(void){
 	    }
           }
 	   printf(1, "\n child# %d with priority %d has finished! \n",getpid(),30-10*i);
+ 	   //endtime = turnaround();
+           //printf(1,"\n The end time is %d ticks\n", endtime);
+	   exit(0);
  	   endtime = turnaround();
            printf(1,"\n The end time is %d ticks\n", endtime);
-	   exit(0);		
         }
         else {
 		printf(2," \n Error \n");

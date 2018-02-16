@@ -94,6 +94,7 @@ found:
   // lab 2
   // set priority to 31 (low priority) initially
   p->priority = 31;
+  p->beginTime = currenttime();
  
 
   release(&ptable.lock);
@@ -258,6 +259,7 @@ exit(int status)
   
   // Add exit status to curproc - Lab01
   curproc->exitStatus = status;
+  turnaround();
 
   // Parent might be sleeping in wait().
   wakeup1(curproc->parent);
@@ -304,7 +306,6 @@ wait(int *status)
         if (status != 0) {
           *status = p->exitStatus;
         }
-        p->turnaroundTime = turnaround();
         kfree(p->kstack);
         p->kstack = 0;
         freevm(p->pgdir);
@@ -437,7 +438,6 @@ scheduler(void)
 		// no processes found within priority range
 		// error?
 	}
-	highestProc->turnaroundTime=turnaround();
 	c->proc = highestProc;
 	switchuvm(highestProc); // what does this do?
 	highestProc->state = RUNNING;
@@ -657,7 +657,7 @@ procdump(void)
 
 // Turnaround function addition
 uint
-turnaround(void)
+currenttime(void)
 {
   uint xticks;
   
@@ -666,4 +666,17 @@ turnaround(void)
   release(&tickslock);
 
   return xticks;
+}
+
+// Getting the turnaround time
+inline uint
+turnaround(void)
+{
+  uint time;
+  struct proc* myProc = myproc();
+
+  time = currenttime();
+  myProc->turnaroundTime = time - myProc->beginTime;
+  cprintf("Turnaround time for this process is: %d\n", time);
+  return time;
 }
